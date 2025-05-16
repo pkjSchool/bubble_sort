@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>泡泡排序大冒險</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f7fa 0%, #e8eaf6 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #3f51b5;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      color: #7e57c2;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .bubbles-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      height: 150px;
+      margin-bottom: 30px;
+    }
+
+    .bubble {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #333;
+      position: relative;
+      transition: all 0.5s ease;
+      border: 4px solid;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .bubble::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 12px;
+      height: 12px;
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+    }
+
+    .bubble.normal {
+      background-color: #90caf9;
+      border-color: #42a5f5;
+    }
+
+    .bubble.comparing {
+      background-color: #ffee58;
+      border-color: #fdd835;
+      transform: scale(1.1);
+      z-index: 2;
+    }
+
+    .bubble.swapping {
+      background-color: #ff8a80;
+      border-color: #ff5252;
+      transform: scale(1.1);
+      z-index: 2;
+    }
+
+    .bubble.sorted {
+      background-color: #a5d6a7;
+      border-color: #66bb6a;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-play {
+      background-color: #2196f3;
+    }
+
+    .btn-play:hover:not(:disabled) {
+      background-color: #1976d2;
+    }
+
+    .btn-pause {
+      background-color: #ff9800;
+    }
+
+    .btn-pause:hover:not(:disabled) {
+      background-color: #f57c00;
+    }
+
+    .btn-next {
+      background-color: #9c27b0;
+    }
+
+    .btn-next:hover:not(:disabled) {
+      background-color: #7b1fa2;
+    }
+
+    .btn-reset {
+      background-color: #757575;
+    }
+
+    .btn-reset:hover {
+      background-color: #616161;
+    }
+
+    .btn-new {
+      background-color: #009688;
+    }
+
+    .btn-new:hover {
+      background-color: #00796b;
+    }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .speed-control span {
+      color: #555;
+    }
+
+    .speed-control input {
+      width: 200px;
+    }
+
+    .explanation-title {
+      font-size: 1.5rem;
+      color: #2196f3;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .explanation-text {
+      font-size: 1.1rem;
+      background-color: #fff9c4;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 5px solid #fbc02d;
+      margin-bottom: 20px;
+    }
+
+    .explanation-box {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .explanation-box h3 {
+      font-size: 1.2rem;
+      color: #1565c0;
+      margin-bottom: 10px;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      text-align: center;
+    }
+
+    .legend-item {
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .legend-item:nth-child(1) {
+      background-color: #e8f5e9;
+    }
+
+    .legend-item:nth-child(2) {
+      background-color: #fffde7;
+    }
+
+    .legend-item:nth-child(3) {
+      background-color: #ffebee;
+    }
+
+    .legend-bubble {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      border: 4px solid;
+    }
+
+    .legend-bubble.sorted {
+      background-color: #a5d6a7;
+      border-color: #66bb6a;
+    }
+
+    .legend-bubble.comparing {
+      background-color: #ffee58;
+      border-color: #fdd835;
+    }
+
+    .legend-bubble.swapping {
+      background-color: #ff8a80;
+      border-color: #ff5252;
+    }
+
+    .icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .icon-play {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+    }
+
+    .icon-pause {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M6 19h4V5H6v14zm8-14v14h4V5h-4z'/%3E%3C/svg%3E");
+    }
+
+    .icon-next {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z'/%3E%3C/svg%3E");
+    }
+
+    .icon-reset {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'/%3E%3C/svg%3E");
+    }
+
+    .icon-info {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232196f3'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E");
+    }
+
+    @media (max-width: 768px) {
+      .bubbles-container {
+        gap: 10px;
+      }
+
+      .bubble {
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
+      }
+
+      .legend {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>🫧 泡泡排序大冒險 🫧</h1>
+      <p>一起來學習如何把數字排隊吧！</p>
+    </header>
+    <div class="card">
+      <div id="bubbles-container" class="bubbles-container"></div>
+      <div class="controls">
+        <button id="btn-play" class="btn-play">
+          <span class="icon icon-play"></span>
+          開始
+        </button>
+        <button id="btn-next" class="btn-next">
+          <span class="icon icon-next"></span>
+          下一步
+        </button>
+        <button id="btn-reset" class="btn-reset">
+          <span class="icon icon-reset"></span>
+          重新開始
+        </button>
+        <button id="btn-new" class="btn-new">
+          新數字
+        </button>
+      </div>
+      <div class="speed-control">
+        <span>速度:</span>
+        <input id="speed-slider" type="range" min="200" max="2000" step="100" value="1000">
+        <span id="speed-value">1秒</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="explanation-title">
+        <span class="icon icon-info"></span>
+        現在發生什麼事？
+      </h2>
+      <p id="explanation-text" class="explanation-text">
+        點擊「開始」按鈕，看看泡泡如何排隊！
+      </p>
+      <div class="explanation-box">
+        <h3>泡泡排序是什麼？</h3>
+        <p>泡泡排序就像是氣泡在水中上升一樣，大的數字會一個一個「浮」到最右邊。</p>
+        <p style="margin-top: 10px;">每次比較相鄰的兩個數字，如果左邊的比右邊的大，就交換它們的位置！</p>
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-bubble sorted"></div>
+          <p>已排序好</p>
+        </div>
+        <div class="legend-item">
+          <div class="legend-bubble comparing"></div>
+          <p>正在比較</p>
+        </div>
+        <div class="legend-item">
+          <div class="legend-bubble swapping"></div>
+          <p>正在交換</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let numbers = [7, 2, 5, 1, 9, 3];
+    let originalNumbers = [...numbers];
+    let currentStep = 0;
+    let isSorting = false;
+    let sortingInterval = null;
+    let speed = 1000;
+    let comparing = [-1, -1];
+    let swapping = [-1, -1];
+    let sorted = [];
+    let currentPhase = 'initial';
+    const bubblesContainer = document.getElementById('bubbles-container');
+    const btnPlay = document.getElementById('btn-play');
+    const btnNext = document.getElementById('btn-next');
+    const btnReset = document.getElementById('btn-reset');
+    const btnNew = document.getElementById('btn-new');
+    const speedSlider = document.getElementById('speed-slider');
+    const speedValue = document.getElementById('speed-value');
+    const explanationText = document.getElementById('explanation-text');
+    function init() {
+      renderBubbles();
+      updateExplanation();
+      btnPlay.addEventListener('click', togglePlay);
+      btnNext.addEventListener('click', bubbleSortStep);
+      btnReset.addEventListener('click', resetDemo);
+      btnNew.addEventListener('click', generateNewNumbers);
+      speedSlider.addEventListener('input', updateSpeed);
+    }
+    function renderBubbles() {
+      bubblesContainer.innerHTML = '';
+      numbers.forEach((num, index) => {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = num;
+        if (sorted.includes(index)) {
+          bubble.classList.add('sorted');
+        } else if (comparing.includes(index)) {
+          bubble.classList.add('comparing');
+        } else if (swapping.includes(index)) {
+          bubble.classList.add('swapping');
+        } else {
+          bubble.classList.add('normal');
+        }
+        bubble.style.transform = `translateY(${num * -4}px)`;
+        bubblesContainer.appendChild(bubble);
+      });
+    }
+    function togglePlay() {
+      isSorting = !isSorting;
+      if (isSorting) {
+        btnPlay.innerHTML = '<span class="icon icon-pause"></span>暫停';
+        btnPlay.className = 'btn-pause';
+        btnNext.disabled = true;
+        sortingInterval = setInterval(bubbleSortStep, speed / 2);
+      } else {
+        btnPlay.innerHTML = '<span class="icon icon-play"></span>開始';
+        btnPlay.className = 'btn-play';
+        btnNext.disabled = false;
+        clearInterval(sortingInterval);
+      }
+    }
+    function bubbleSortStep() {
+      if (sorted.length === numbers.length - 1 || currentPhase === 'completed') {
+        sorted = Array.from({ length: numbers.length }, (_, i) => i);
+        currentPhase = 'completed';
+        if (isSorting) {
+          togglePlay();
+        }
+        renderBubbles();
+        updateExplanation();
+        return;
+      }
+      const currentPass = sorted.length;
+      const currentIndex = currentStep % (numbers.length - 1 - currentPass);
+      if (swapping[0] === -1) {
+        const i = currentIndex;
+        const j = currentIndex + 1;
+        comparing = [i, j];
+        currentPhase = 'comparing';
+        renderBubbles();
+        updateExplanation();
+        if (numbers[i] > numbers[j]) {
+          setTimeout(() => {
+            swapping = [i, j];
+            currentPhase = 'swapping';
+            renderBubbles();
+            updateExplanation();
+          }, isSorting ? speed / 2 : 0);
+        } else {
+          setTimeout(() => {
+            comparing = [-1, -1];
+            if (currentIndex === numbers.length - 2 - currentPass) {
+              sorted.push(numbers.length - 1 - currentPass);
+            }
+            currentStep++;
+            renderBubbles();
+            updateExplanation();
+          }, isSorting ? speed : 0);
+        }
+      }
+      else {
+        const i = swapping[0];
+        const j = swapping[1];
+        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+        swapping = [-1, -1];
+        comparing = [-1, -1];
+        if (currentIndex === numbers.length - 2 - currentPass) {
+          sorted.push(numbers.length - 1 - currentPass);
+        }
+        currentStep++;
+        renderBubbles();
+        updateExplanation();
+      }
+    }
+    function resetDemo() {
+      if (isSorting) {
+        togglePlay();
+      }
+      numbers = [...originalNumbers];
+      currentStep = 0;
+      comparing = [-1, -1];
+      swapping = [-1, -1];
+      sorted = [];
+      currentPhase = 'initial';
+      btnPlay.innerHTML = '<span class="icon icon-play"></span>開始';
+      btnPlay.className = 'btn-play';
+      btnNext.disabled = false;
+      renderBubbles();
+      updateExplanation();
+    }
+    function generateNewNumbers() {
+      if (isSorting) {
+        togglePlay();
+      }
+      const newNumbers = Array.from({ length: 6 }, () => Math.floor(Math.random() * 9) + 1);
+      originalNumbers = [...newNumbers];
+      numbers = [...newNumbers];
+      currentStep = 0;
+      comparing = [-1, -1];
+      swapping = [-1, -1];
+      sorted = [];
+      currentPhase = 'initial';
+      renderBubbles();
+      updateExplanation();
+    }
+    function updateSpeed() {
+      speed = parseInt(speedSlider.value);
+      speedValue.textContent = (speed / 1000) + '秒';
+      if (isSorting) {
+        clearInterval(sortingInterval);
+        sortingInterval = setInterval(bubbleSortStep, speed / 2);
+      }
+    }
+    function updateExplanation() {
+      let text = '';
+      if (currentPhase === 'initial') {
+        text = '點擊「開始」按鈕，看看泡泡如何排隊！';
+      } else if (currentPhase === 'comparing') {
+        if (comparing[0] >= 0 && comparing[1] >= 0) {
+          text = `正在比較第 ${comparing[0] + 1} 個數字 (${numbers[comparing[0]]}) 和第 ${comparing[1] + 1} 個數字 (${numbers[comparing[1]]})`;
+        } else {
+          text = '正在比較相鄰的數字...';
+        }
+      } else if (currentPhase === 'swapping') {
+        if (swapping[0] >= 0 && swapping[1] >= 0) {
+          text = `${numbers[swapping[0]]} 比 ${numbers[swapping[1]]} 大，所以它們要交換位置！`;
+        } else {
+          text = '正在交換數字...';
+        }
+      } else if (currentPhase === 'completed') {
+        text = '🎉 太棒了！所有數字都排好隊了！';
+      }
+      explanationText.textContent = text;
+    }
+    init();
+  </script>
+</body>
+
+</html>
